@@ -177,7 +177,7 @@
     [self play];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onApplicationWillResignActive) name:UIApplicationWillResignActiveNotification object:nil];
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onApplicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onApplicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -235,7 +235,9 @@
 }
 
 - (void)onApplicationDidBecomeActive {
-    [self play];
+    if (self.navigationController.topViewController == self) {    
+        [self play];
+    }
 }
 
 
