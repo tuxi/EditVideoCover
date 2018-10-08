@@ -30,6 +30,6 @@ NS_ASSUME_NONNULL_END
 /// @param controller AlpEditCoverViewController
 /// @param start 封面的起始时间 单位为秒
 /// @param end 封面的结束时间 单位为秒
-- (void)editCoverViewController:(nullable AlpEditCoverViewController *)controller didSelectCoverWithStartTime:(CGFloat)start endTime:(CGFloat)end;
+- (void)editCoverViewController:(nullable AlpEditCoverViewController *)controller didChangeCoverWithStartTime:(CGFloat)start endTime:(CGFloat)end;
 
 @end

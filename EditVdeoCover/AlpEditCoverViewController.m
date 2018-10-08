@@ -196,7 +196,8 @@
     }];
 }
 
-- (void)updateRange {
+- (void)setupVideoCover {
+    // 初始化videoTime，选择默认的cover
     if (self.videoTime.value == 0) {
         // 将总的time转换为当前player的timescale相同的time
         CMTime time = self.playerItem.duration;
@@ -260,7 +261,7 @@
     if (currentTime.value <= 0) {
         return;
     }
-    [self updateRange];
+    [self setupVideoCover];
     CGFloat replayPosition = CMTimeGetSeconds(currentTime);
     CGFloat startSeconds = CMTimeGetSeconds(self.coverTime);
     CMTime stopTime = CMTimeMake(AlpVideoCameraCoverSliderMaxRange(self.slider.range), self.coverTime.timescale);
@@ -296,10 +297,20 @@
     self.coverTime = coverTime;
     CGFloat start = CMTimeGetSeconds(coverTime);
     [self seekVideoToPos:start];
-    if (self.delegate && [self.delegate respondsToSelector:@selector(editCoverViewController:didSelectCoverWithStartTime:endTime:)]) {
-        CMTime stopTime = CMTimeMake(AlpVideoCameraCoverSliderMaxRange(self.slider.range), self.coverTime.timescale);
-        CGFloat stopSeconds = CMTimeGetSeconds(stopTime);
-        [self.delegate editCoverViewController:self didSelectCoverWithStartTime:start endTime:stopSeconds];
+}
+
+- (void)setCoverTime:(CMTime)coverTime {
+    if (coverTime.timescale != _coverTime.timescale ||
+        coverTime.value != _coverTime.value) {
+        _coverTime = coverTime;
+        if (self.delegate && [self.delegate respondsToSelector:@selector(editCoverViewController:didChangeCoverWithStartTime:endTime:)]) {
+            CMTime stopTime = CMTimeMake(AlpVideoCameraCoverSliderMaxRange(self.slider.range), self.coverTime.timescale);
+            CGFloat startSeconds = CMTimeGetSeconds(coverTime);
+            CGFloat stopSeconds = CMTimeGetSeconds(stopTime);
+            [self.delegate editCoverViewController:self
+                       didChangeCoverWithStartTime:startSeconds
+                                           endTime:stopSeconds];
+        }
     }
 }
 
