@@ -16,6 +16,7 @@
 		D0427868216B13FB0062C6B5 /* AlpEditVideoNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = D0427867216B13FB0062C6B5 /* AlpEditVideoNavigationBar.m */; };
 		D042786B216B14840062C6B5 /* AlpVideoCameraUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = D042786A216B14840062C6B5 /* AlpVideoCameraUtils.m */; };
 		D042786D216B19570062C6B5 /* video.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = D042786C216B18D80062C6B5 /* video.MP4 */; };
+		D042786F216B238F0062C6B5 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D042786E216B238F0062C6B5 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		D0427869216B14840062C6B5 /* AlpVideoCameraUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlpVideoCameraUtils.h; sourceTree = "<group>"; };
 		D042786A216B14840062C6B5 /* AlpVideoCameraUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlpVideoCameraUtils.m; sourceTree = "<group>"; };
 		D042786C216B18D80062C6B5 /* video.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video.MP4; sourceTree = "<group>"; };
+		D042786E216B238F0062C6B5 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 		D0427849216B136B0062C6B5 /* EditVdeoCover */ = {
 			isa = PBXGroup;
 			children = (
+				D042786E216B238F0062C6B5 /* README.md */,
 				D0427861216B13990062C6B5 /* AlpEditCoverViewController.h */,
 				D0427860216B13990062C6B5 /* AlpEditCoverViewController.m */,
 				D0427863216B13990062C6B5 /* AlpVideoCameraCoverSlider.h */,
@@ -145,6 +148,7 @@
 			files = (
 				D042786D216B19570062C6B5 /* video.MP4 in Resources */,
 				D0427857216B136D0062C6B5 /* LaunchScreen.storyboard in Resources */,
+				D042786F216B238F0062C6B5 /* README.md in Resources */,
 				D0427854216B136D0062C6B5 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
