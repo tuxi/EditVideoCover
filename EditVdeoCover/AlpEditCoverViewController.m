@@ -30,9 +30,7 @@
 @interface AlpEditCoverViewController ()<UICollectionViewDelegate,UICollectionViewDataSource>
 @property(nonatomic,strong)AlpVideoCameraCoverPlayerView *coverPlayerView;
 @property(nonatomic,strong)UICollectionView *coverImageCollectionView;
-///照片数组
 @property (nonatomic, strong) NSMutableArray<AlpVideoCameraCover *> *photoArrays;
-@property (nonatomic, strong) NSIndexPath *selectedIndexPath;
 @property (nonatomic, strong) AlpVideoCameraCoverSlider *slider;
 @property (nonatomic, assign) CMTime coverTime;
 @property (nonatomic, assign) CMTime videoTime;
@@ -43,7 +41,6 @@
 @property (nonatomic, strong) AVPlayer *thumbPlayer;
 @property (nonatomic, strong) AVPlayerItem *thumbPlayerItem;
 @property (nonatomic, strong) CADisplayLink *displayLink;
-@property (nonatomic, assign) CGFloat videoPlaybackPosition;
 @property (nonatomic, strong) AlpEditVideoNavigationBar *navigationBar;
 
 @end
@@ -57,14 +54,13 @@
     _mainPlayer = nil;
     [_thumbPlayer pause];
     _thumbPlayer = nil;
-    [self stopPlaybackTimeChecker];
+    [self stopReplayTimer];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor blackColor];
-    self.selectedIndexPath = [NSIndexPath indexPathForItem:0 inSection:0];
     self.photoArrays = [[NSMutableArray alloc] init];
     [self setupUI];
     [self getVideoTotalValueAndScale];
@@ -218,12 +214,12 @@
 
 - (void)play {
     [_mainPlayer play];
-    [self startPlaybackTimeChecker];
+    [self startReplayTimer];
 }
 
 - (void)pause {
     [_mainPlayer pause];
-    [self stopPlaybackTimeChecker];
+    [self stopReplayTimer];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -244,42 +240,40 @@
 ////////////////////////////////////////////////////////////////////////
 #pragma mark - 视频播放时间的检测
 ////////////////////////////////////////////////////////////////////////
-- (void)stopPlaybackTimeChecker {
+- (void)stopReplayTimer {
     if (self.displayLink) {
         [self.displayLink invalidate];
         self.displayLink = nil;
     }
 }
 
-- (void)startPlaybackTimeChecker {
+- (void)startReplayTimer {
     
-    [self stopPlaybackTimeChecker]; // 停止检测
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(onPlaybackTimeCheckerTimer)];
+    [self stopReplayTimer]; // 停止检测
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(onReplayTimer)];
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 }
 
-- (void)onPlaybackTimeCheckerTimer {
+- (void)onReplayTimer {
 //    CMTimeShow(self.mainPlayer.currentTime);
     CMTime currentTime = self.mainPlayer.currentTime;
     if (currentTime.value <= 0) {
         return;
     }
     [self updateRange];
-    self.videoPlaybackPosition = CMTimeGetSeconds(currentTime);
+    CGFloat replayPosition = CMTimeGetSeconds(currentTime);
     CGFloat startSeconds = CMTimeGetSeconds(self.coverTime);
     CMTime stopTime = CMTimeMake(AlpVideoCameraCoverSliderMaxRange(self.slider.range), self.coverTime.timescale);
     CGFloat stopSeconds = CMTimeGetSeconds(stopTime);
     // 当视频播放完后，重置开始时间
-    if (self.videoPlaybackPosition >= stopSeconds) {
-        self.videoPlaybackPosition = startSeconds;
+    if (replayPosition >= stopSeconds) {
         [self seekVideoToPos:startSeconds];
     }
 }
 
 - (void)seekVideoToPos:(CGFloat)pos {
     
-    self.videoPlaybackPosition = pos;
-    CMTime time = CMTimeMakeWithSeconds(self.videoPlaybackPosition, self.coverTime.timescale);
+    CMTime time = CMTimeMakeWithSeconds(pos, self.coverTime.timescale);
     [self.mainPlayer seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
     [self.thumbPlayer seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
     [self.mainPlayer play];
@@ -300,8 +294,13 @@
 - (void)chooseWithTime:(CMTimeValue)value {
     CMTime coverTime = CMTimeMake(value, self.videoTime.timescale);
     self.coverTime = coverTime;
-    CGFloat seconds = CMTimeGetSeconds(coverTime);
-    [self seekVideoToPos:seconds];
+    CGFloat start = CMTimeGetSeconds(coverTime);
+    [self seekVideoToPos:start];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(editCoverViewController:didSelectCoverWithStartTime:endTime:)]) {
+        CMTime stopTime = CMTimeMake(AlpVideoCameraCoverSliderMaxRange(self.slider.range), self.coverTime.timescale);
+        CGFloat stopSeconds = CMTimeGetSeconds(stopTime);
+        [self.delegate editCoverViewController:self didSelectCoverWithStartTime:start endTime:stopSeconds];
+    }
 }
 
 - (void)didClickNextButton {
@@ -325,26 +324,6 @@
     
     cell.imageView.image = _photoArrays[indexPath.item].firstFrameImage;
     return cell;
-}
-
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    
-    NSIndexPath *firstSelectedIndexPath = self.selectedIndexPath;
-    [collectionView deselectItemAtIndexPath:firstSelectedIndexPath animated:YES];
-    
-    UICollectionViewScrollPosition position = UICollectionViewScrollPositionNone;
-    if (firstSelectedIndexPath.item > indexPath.item) {
-        position = UICollectionViewScrollPositionRight;
-    }
-    else if (firstSelectedIndexPath.item < indexPath.item) {
-        position = UICollectionViewScrollPositionLeft;
-    }
-    else {
-        position = UICollectionViewScrollPositionNone;
-    }
-    [self.coverImageCollectionView selectItemAtIndexPath:indexPath animated:YES scrollPosition:position];
-    self.selectedIndexPath = indexPath;
-    [_coverImageCollectionView reloadData];
 }
 
 
