@@ -300,17 +300,14 @@
 }
 
 - (void)setCoverTime:(CMTime)coverTime {
-    if (coverTime.timescale != _coverTime.timescale ||
-        coverTime.value != _coverTime.value) {
-        _coverTime = coverTime;
-        if (self.delegate && [self.delegate respondsToSelector:@selector(editCoverViewController:didChangeCoverWithStartTime:endTime:)]) {
-            CMTime stopTime = CMTimeMake(AlpVideoCameraCoverSliderMaxRange(self.slider.range), self.coverTime.timescale);
-            CGFloat startSeconds = CMTimeGetSeconds(coverTime);
-            CGFloat stopSeconds = CMTimeGetSeconds(stopTime);
-            [self.delegate editCoverViewController:self
-                       didChangeCoverWithStartTime:startSeconds
-                                           endTime:stopSeconds];
-        }
+    _coverTime = coverTime;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(editCoverViewController:didChangeCoverWithStartTime:endTime:)]) {
+        CMTime stopTime = CMTimeMake(AlpVideoCameraCoverSliderMaxRange(self.slider.range), self.coverTime.timescale);
+        CGFloat startSeconds = CMTimeGetSeconds(coverTime);
+        CGFloat stopSeconds = CMTimeGetSeconds(stopTime);
+        [self.delegate editCoverViewController:self
+                   didChangeCoverWithStartTime:startSeconds
+                                       endTime:stopSeconds];
     }
 }
 
